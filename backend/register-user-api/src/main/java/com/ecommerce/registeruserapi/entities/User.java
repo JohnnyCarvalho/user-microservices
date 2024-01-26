@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "user-data")
+@Table(name = "user_data")
 @Getter
 @Setter
 @Transactional
@@ -21,48 +21,52 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column
     private Long id;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
     @Column(name = "middle_name")
     private String middleName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(name = "user_name", unique = true)
+    @Column(name = "user_name", unique = true, nullable = false)
     private String userName;
 
-    @Column(name = "phone_number")
-    private Integer phoneNumber;
+    @Column(name = "phone_number", nullable = false)
+    private Long phoneNumber;
 
-    @Column(name = "document_number")
-    private Integer documentNumber;
+    @Column(name = "document_number", nullable = false)
+    private String documentNumber;
 
-    @Column
+    @Column(nullable = false)
     private String street;
 
-    @Column(name = "house_number")
+    @Column(name = "house_number", nullable = false)
     private Integer houseNumber;
 
     @Column(name = "reference_point")
     private String referencePoint;
 
-    @Column
+    @Column(nullable = false)
     private String state;
 
-    @Column
+    @Column(nullable = false)
     private String country;
 
-    @Column(name = "zip_code")
-    private Integer zipCode;
+    @Column(name = "zip_code", nullable = false)
+    private String zipCode;
+
+    @Column(nullable = false)
+    private String password;
 
     @Column
-    private String password;
+    private Boolean status = true;
 
 }
