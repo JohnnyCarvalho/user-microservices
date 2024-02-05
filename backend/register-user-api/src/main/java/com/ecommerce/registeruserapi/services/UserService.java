@@ -10,6 +10,7 @@ import com.ecommerce.registeruserapi.entities.User;
 import com.ecommerce.registeruserapi.exception.AlreadyExistException;
 import com.ecommerce.registeruserapi.exception.UserBlockedException;
 import com.ecommerce.registeruserapi.mappers.UserCreateMapper;
+import com.ecommerce.registeruserapi.producer.UserProducer;
 import com.ecommerce.registeruserapi.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    private final UserProducer userProducer;
+
+    @Transactional
     public UserCreateResponse createUser(UserCreateRequest userCreate) {
 
         verifyUserNameAlreadyExist(userCreate);
@@ -37,6 +41,8 @@ public class UserService {
         final User newUser = UserCreateMapper.toCreateModel(userCreate);
 
         userRepository.save(newUser);
+
+        sendNotification(userCreate);
 
         return UserCreateMapper.toCreateResponseModel(newUser);
     }
@@ -62,5 +68,9 @@ public class UserService {
         if (userStatus != null && Boolean.FALSE.equals(userStatus.getStatus())) {
             throw new UserBlockedException(USER_BLOCKED.getKey());
         }
+    }
+
+    private void sendNotification(UserCreateRequest userCreate) {
+        userProducer.publishMessageEmail(userCreate);
     }
 }
