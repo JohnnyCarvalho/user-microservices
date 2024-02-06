@@ -125,4 +125,27 @@ Depois disso, deve criar uma instancia com o nome ```notification```, em seguida
 
 Feito isso, a aplicação já deverá estar conectando com o ClouAMQP e ao tentar salvar um usuário deve aparecer as mensagens na fila, aguardando o <b>[microcervices-email](https://github.com/JohnnyCarvalho/email-microservices)</b> subir.
 
+## Passo para criar um usuário
+O objeto que deve ser enviado no body da requisição é um semelhante a esse:
+
+```json
+{
+    "first_name": "Name",
+    "middle_name": "Name",
+    "last_name": "Name",
+    "email": "seu_email@gmail.com",
+    "user_name": "seu_user_name",
+    "phone_number": 41989564256,
+    "document_number": "025485685456",
+    "street": "Teixeira Luiz Da Rocha",
+    "house_number": 694,
+    "reference_point": "Farmácias Nissei",
+    "state": "MG",
+    "country": "Brasil",
+    "zip_code": "08650494278",
+    "password": "000000000"
+}
+```
+Deve-se trocar os dados pelo seus dados, o e-mail registrado aqui, é o mesmo que irá receber a notificação.
+
 
