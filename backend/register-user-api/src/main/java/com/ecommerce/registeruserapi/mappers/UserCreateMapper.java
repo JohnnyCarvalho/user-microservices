@@ -6,7 +6,7 @@ import com.ecommerce.registeruserapi.entities.User;
 
 public interface UserCreateMapper {
 
-    static User toCreateModel(final UserCreateRequest request) {
+    static User toCreateModel(final UserCreateRequest request, String passwordEncoder) {
         final User user = new User();
 
         user.setFirstName(request.getFirstName());
@@ -22,7 +22,7 @@ public interface UserCreateMapper {
         user.setState(request.getState());
         user.setCountry(request.getCountry());
         user.setZipCode(request.getZipCode());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder);
 
         return user;
     }

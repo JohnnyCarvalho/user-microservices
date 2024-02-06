@@ -15,6 +15,7 @@ import com.ecommerce.registeruserapi.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,8 @@ public class UserService {
 
     private final UserProducer userProducer;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Transactional
     public UserCreateResponse createUser(UserCreateRequest userCreate) {
 
@@ -38,7 +41,9 @@ public class UserService {
 
         verifyUserStatus(userCreate);
 
-        final User newUser = UserCreateMapper.toCreateModel(userCreate);
+        String hashedPassword = passwordEncoder.encode(userCreate.getPassword());
+
+        final User newUser = UserCreateMapper.toCreateModel(userCreate, hashedPassword);
 
         userRepository.save(newUser);
 
