@@ -32,7 +32,6 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
     public UserCreateResponse createUser(UserCreateRequest userCreate) {
 
         verifyUserNameAlreadyExist(userCreate);
