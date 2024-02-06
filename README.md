@@ -9,15 +9,15 @@
 
 ## Principais tecnologias utilizadas: <br/>
 <p>
-  <img align="center" alt="Angular" height="30" width="40" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg" />
-  <img align="center" alt="Java" height="30" width="40" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original-wordmark.svg" />
-  <img align="center" alt="Spring" height="30" width="40" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original-wordmark.svg" />
+    <img align="center" alt="Java" height="30" width="40" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original-wordmark.svg" />
+    <img align="center" alt="Spring" height="30" width="40" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original-wordmark.svg" />
+    <img align="center" alt="RabbitMQ" height="30" width="40" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rabbitmq/rabbitmq-original.svg"/>RabbitMQ
 </p>
 
 ## Resumo do projeto
 
-Este é um projeto para aperfeiçoamento das habilidades em Angular e Java, utilizando a arquitetura de micro serviços. Nessa aplicação irei implementar um CRUD de usuário e comunicação com um broker para envio de e-mail.
-Esse projeto será executado em etapas, a começar pelo back-end e finalizando com a implementação do front-end:
+Este é um projeto para aperfeiçoamento das habilidades em Java, utilizando a arquitetura de micro serviços. Nessa aplicação irei implementar um serviço registro de usuário e comunicação com um broker para envio de e-mail.
+Esse projeto será executado em etapas, a começar pelos 2 microservices back-end e finalizando com a implementação do front-end em Angular:
 
 ## Etapas do projeto
 ####
