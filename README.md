@@ -152,5 +152,7 @@ Deve-se trocar os dados pelo seus dados, o e-mail registrado aqui, é o mesmo qu
     Gif do projeto rodando
 </h1>
 
+<p align="center">
 <img align="center" height="620" width="980" src="https://github.com/JohnnyCarvalho/user-microservices/blob/master/backend/register-user-api/assets/GifDoProjeto.gif">
+</p>
 
