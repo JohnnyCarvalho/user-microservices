@@ -14,6 +14,7 @@ public class UserProducer {
 
     /**
      * Inject RabbitTemplate by constructor in UserProducer
+     *
      * @param rabbitTemplate
      */
     public UserProducer(RabbitTemplate rabbitTemplate) {
