@@ -40,7 +40,7 @@ public class User {
     private String userName;
 
     @Column(name = "phone_number", nullable = false)
-    private Long phoneNumber;
+    private String phoneNumber;
 
     @Column(name = "document_number", nullable = false)
     private String documentNumber;
