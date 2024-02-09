@@ -2,7 +2,6 @@ package com.ecommerce.registeruserapi.producer;
 
 import com.ecommerce.registeruserapi.dto.request.UserCreateRequest;
 import com.ecommerce.registeruserapi.dto.response.EmailResponse;
-import com.ecommerce.registeruserapi.mappers.NotificationMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserProducer {
 
-    final RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     /**
      * Inject RabbitTemplate by constructor in UserProducer
@@ -29,7 +28,12 @@ public class UserProducer {
 
     public void publishMessageEmail(UserCreateRequest user) {
 
-        EmailResponse response = NotificationMapper.toEmailREsponse(user);
+        EmailResponse response = EmailResponse.builder()
+                .userName(user.getUserName())
+                .emailTo(user.getEmail())
+                .subject("Registration Successfully Completed!")
+                .text("Welcome to the user registration system sr " + user.getFirstName() + "!")
+                .build();
 
         rabbitTemplate.convertAndSend("", routingKey, response);
     }

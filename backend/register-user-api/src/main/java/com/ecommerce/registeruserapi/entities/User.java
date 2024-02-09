@@ -49,7 +49,7 @@ public class User {
     private String street;
 
     @Column(name = "house_number", nullable = false)
-    private Integer houseNumber;
+    private String houseNumber;
 
     @Column(name = "reference_point")
     private String referencePoint;
