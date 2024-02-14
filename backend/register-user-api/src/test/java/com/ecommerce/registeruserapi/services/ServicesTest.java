@@ -4,10 +4,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,13 +19,20 @@ import com.ecommerce.registeruserapi.producer.UserProducer;
 import com.ecommerce.registeruserapi.repositories.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
+@ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ServicesTest {
 
     @MockBean
@@ -62,8 +67,8 @@ public class ServicesTest {
         assertNotNull(response);
         assertNotNull(userAlready);
         assertNotNull(emailAlready);
-        verify(repository, times(2)).findByUserName(eq(request.getUserName()));
-        verify(repository, times(2)).findByEmail(eq(request.getEmail()));
+        verify(repository).findByUserName(eq(request.getUserName()));
+        verify(repository).findByEmail(eq(request.getEmail()));
         verify(producer).publishMessageEmail(request);
     }
 

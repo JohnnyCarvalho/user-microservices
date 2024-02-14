@@ -37,7 +37,7 @@ public class UserService {
 
         User userEntity = modelMapper.map(userCreate, User.class);
 
-        verifyUserNameAlreadyExist(userCreate, userEntity);
+        verifyUserNameAlreadyExist(userCreate);
 
         String hashedPassword = passwordEncoder.encode(userCreate.getPassword());
 
