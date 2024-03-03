@@ -17,11 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class UserService {
 
@@ -35,9 +33,7 @@ public class UserService {
 
     public UserCreateResponse createUser(UserCreateRequest userCreate) {
 
-        User userEntity = modelMapper.map(userCreate, User.class);
-
-        verifyUserNameAlreadyExist(userCreate);
+        verifyUserStatus(userCreate);
 
         String hashedPassword = passwordEncoder.encode(userCreate.getPassword());
 
@@ -52,12 +48,21 @@ public class UserService {
         return modelMapper.map(newUser, UserCreateResponse.class);
     }
 
+
+    private void verifyUserStatus(UserCreateRequest userCreate) {
+        Optional<User> userStatus = userRepository.findByUserName(userCreate.getUserName());
+
+        if (userStatus.isPresent() && userStatus.get().getStatus().equals(false)) {
+            throw new UserBlockedException(USER_BLOCKED.getKey());
+        }
+        verifyUserNameAlreadyExist(userCreate);
+    }
+
     private void verifyUserNameAlreadyExist(UserCreateRequest userCreate) {
         userRepository.findByUserName(userCreate.getUserName())
                 .ifPresent(existingUser -> {
                     throw new AlreadyExistException(USER_NAME_ALREADY_EXIST.getKey());
                 });
-
         verifyEmailAlreadyExist(userCreate);
     }
 
@@ -67,16 +72,6 @@ public class UserService {
                 .ifPresent(existingUserEmail -> {
                     throw new AlreadyExistException(EMAIL_ALREADY_EXIST.getKey());
                 });
-
-        verifyUserStatus(userCreate);
-    }
-
-    private void verifyUserStatus(UserCreateRequest userCreate) {
-        Optional<User> userStatus = userRepository.findByUserName(userCreate.getUserName());
-
-        if (userStatus.isPresent() && userStatus.get().getStatus().equals(false)) {
-            throw new UserBlockedException(USER_BLOCKED.getKey());
-        }
     }
 
     private void sendNotification(UserCreateRequest userCreate) {

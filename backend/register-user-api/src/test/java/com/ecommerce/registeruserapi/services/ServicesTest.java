@@ -18,15 +18,16 @@ import com.ecommerce.registeruserapi.exception.UserBlockedException;
 import com.ecommerce.registeruserapi.producer.UserProducer;
 import com.ecommerce.registeruserapi.repositories.UserRepository;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -44,8 +45,11 @@ public class ServicesTest {
     @Autowired
     private UserService service;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    @BeforeEach
+    public void cleanUp() {
+        repository.deleteAll();
+    }
+
 
     @Test
     public void shouldCreateUserInDataBase() {
@@ -76,49 +80,31 @@ public class ServicesTest {
     public void shouldReturnOneAlreadyExistExceptionWithMessageUserNameAlreadyExist() {
         UserCreateRequest request = ServicesMock.createUserModelRequest();
 
-        when(repository.findByUserName(eq(request.getUserName()))).thenReturn(Optional.of(new User()));
+        service.createUser(request);
 
         assertThatThrownBy(() -> service.createUser(request))
                 .isInstanceOf(AlreadyExistException.class)
                 .hasMessage(KeyMessageException.USER_NAME_ALREADY_EXIST.getKey());
-
-        verify(repository).findByUserName(eq(request.getUserName()));
     }
 
     @Test
     public void shouldReturnOneAlreadyExistExceptionWithMessageEmailAlreadyExist() {
-        UserCreateRequest request = ServicesMock.createUserModelRequest();
+        UserCreateRequest requestBefore = ServicesMock.createUserModelRequest();
+        UserCreateRequest requestAfter = ServicesMock.createUserEmailAlreadyExistModelRequest();
 
-        when(repository.findByEmail(eq(request.getEmail()))).thenReturn(Optional.of(new User()));
+        service.createUser(requestBefore);
 
-        assertThatThrownBy(() -> service.createUser(request))
+        assertThatThrownBy(() -> service.createUser(requestAfter))
                 .isInstanceOf(AlreadyExistException.class)
                 .hasMessage(KeyMessageException.EMAIL_ALREADY_EXIST.getKey());
-
-        verify(repository).findByEmail(eq(request.getEmail()));
-
     }
 
     @Test
     public void shouldReturnOneUserBlockedExceptionWithMessageUserBlocked() {
+        UserCreateRequest requestAfter = ServicesMock.createUserFromBlockedModelRequest();
 
-        //TODO PAREI AQUI, TENTANDO TESTAR O MÉTODO USUÁRIO BLOQUEADO
-
-        //Arrange
-        UserCreateRequest requestBefore = ServicesMock.createUserBlockedModelRequest();
-        User request = modelMapper.map(requestBefore, User.class);
-        request.setStatus(false);
-
-        when(repository.findByUserName(request.getUserName())).thenReturn(Optional.empty());
-
-        //Act
-        repository.save(request);
-
-        assertThatThrownBy(() -> repository.save(request))
+        assertThatThrownBy(() -> service.createUser(requestAfter))
                 .isInstanceOf(UserBlockedException.class)
-                        .hasMessage(KeyMessageException.USER_BLOCKED.getKey());
-
-        //Assert
-        verify(repository).findByUserName(request.getEmail());
+                .hasMessage(KeyMessageException.USER_BLOCKED.getKey());
     }
 }
