@@ -1,11 +1,11 @@
 package com.ecommerce.registeruserapi.services;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -20,90 +20,80 @@ import com.ecommerce.registeruserapi.repositories.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Spy;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 public class ServicesTest {
 
-    @MockBean
-    private UserProducer producer;
+    @Mock
+    private UserRepository userRepository;
 
-    @Spy
-    private UserRepository repository;
+    @Mock
+    private UserProducer userProducer;
 
-    @Autowired
-    private UserService service;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private ModelMapper modelMapper;
+
+    @InjectMocks
+    private UserService userService;
+
+    private UserCreateRequest userCreateRequest;
 
     @BeforeEach
-    public void cleanUp() {
-        repository.deleteAll();
-    }
-
-
-    @Test
-    public void shouldCreateUserInDataBase() {
-        UserCreateRequest request = ServicesMock.createUserModelRequest();
-        UserCreateResponse responseExpect = ServicesMock.createUserModelResponse();
-
-        doNothing().when(producer).publishMessageEmail(request);
-        when(repository.findByUserName(eq(request.getUserName()))).thenReturn(Optional.empty());
-        when(repository.findByEmail(eq(request.getEmail()))).thenReturn(Optional.empty());
-
-        UserCreateResponse response = service.createUser(request);
-        Optional<User> userAlready = repository.findByUserName(request.getUserName());
-        Optional<User> emailAlready = repository.findByEmail(request.getEmail());
-
-        assertEquals(responseExpect.getUserName(), response.getUserName());
-        assertEquals(responseExpect.getStatus(), response.getStatus());
-        assertFalse(userAlready.isPresent());
-        assertFalse(emailAlready.isPresent());
-        assertNotNull(response);
-        assertNotNull(userAlready);
-        assertNotNull(emailAlready);
-        verify(repository).findByUserName(eq(request.getUserName()));
-        verify(repository).findByEmail(eq(request.getEmail()));
-        verify(producer).publishMessageEmail(request);
+    void setUp() {
+        userCreateRequest = ServicesMock.createUserModelRequest();
+        userCreateRequest.setUserName("testUser");
+        userCreateRequest.setPassword("password");
+        userCreateRequest.setEmail("test@example.com");
     }
 
     @Test
-    public void shouldReturnOneAlreadyExistExceptionWithMessageUserNameAlreadyExist() {
-        UserCreateRequest request = ServicesMock.createUserModelRequest();
+    void whenCreateUser_thenSucceed() {
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(anyString())).thenReturn("hashedPassword");
+        when(modelMapper.map(any(), eq(User.class))).thenReturn(new User());
+        when(modelMapper.map(any(), eq(UserCreateResponse.class))).thenReturn(new UserCreateResponse());
 
-        service.createUser(request);
+        assertDoesNotThrow(() -> userService.createUser(userCreateRequest));
+        verify(userRepository, times(1)).save(any(User.class));
+        verify(userProducer, times(1)).publishMessageEmail(any(UserCreateRequest.class));
+    }
 
-        assertThatThrownBy(() -> service.createUser(request))
+    @Test
+    void whenUserNameExists_thenThrowAlreadyExistException() {
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.of(new User()));
+
+        assertThatThrownBy(() -> userService.createUser(userCreateRequest))
                 .isInstanceOf(AlreadyExistException.class)
                 .hasMessage(KeyMessageException.USER_NAME_ALREADY_EXIST.getKey());
     }
 
     @Test
-    public void shouldReturnOneAlreadyExistExceptionWithMessageEmailAlreadyExist() {
-        UserCreateRequest requestBefore = ServicesMock.createUserModelRequest();
-        UserCreateRequest requestAfter = ServicesMock.createUserEmailAlreadyExistModelRequest();
+    void whenEmailExists_thenThrowAlreadyExistException() {
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(new User()));
 
-        service.createUser(requestBefore);
-
-        assertThatThrownBy(() -> service.createUser(requestAfter))
+        assertThatThrownBy(() -> userService.createUser(userCreateRequest))
                 .isInstanceOf(AlreadyExistException.class)
                 .hasMessage(KeyMessageException.EMAIL_ALREADY_EXIST.getKey());
     }
 
     @Test
-    public void shouldReturnOneUserBlockedExceptionWithMessageUserBlocked() {
-        UserCreateRequest requestAfter = ServicesMock.createUserFromBlockedModelRequest();
+    void whenUserBlocked_thenThrowUserBlockedException() {
+        User blockedUser = new User();
+        blockedUser.setStatus(false);
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.of(blockedUser));
 
-        assertThatThrownBy(() -> service.createUser(requestAfter))
+        assertThatThrownBy(() -> userService.createUser(userCreateRequest))
                 .isInstanceOf(UserBlockedException.class)
                 .hasMessage(KeyMessageException.USER_BLOCKED.getKey());
     }
