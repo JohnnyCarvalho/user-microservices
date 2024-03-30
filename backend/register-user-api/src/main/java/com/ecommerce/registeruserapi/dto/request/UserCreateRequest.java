@@ -31,16 +31,16 @@ public class UserCreateRequest {
     private String userName;
 
     @NotNull(message = "Phone is not null!")
-    private Long phoneNumber;
+    private String phoneNumber;
 
-    @NotBlank(message = "Document is not null!")
+    @NotNull(message = "Document is not null!")
     private String documentNumber;
 
     @NotBlank(message = "Street is not null!")
     private String street;
 
     @NotNull(message = "House number is not null!")
-    private Integer houseNumber;
+    private String houseNumber;
 
     private String referencePoint;
 
@@ -56,5 +56,4 @@ public class UserCreateRequest {
     @NotBlank(message = "Password is not null!")
     private String password;
 
-    private Boolean status = true;
 }

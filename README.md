@@ -22,12 +22,13 @@ Esse projeto será executado em etapas, a começar pelos 2 microservices back-en
 ## Possíveis status das etapas do projeto
 ####
 <img align="center" height="20" width="20" src="https://github.com/JohnnyCarvalho/user-microservices/blob/master/backend/register-user-api/assets/loading.gif"> - Em andamento.<br>
-<img align="center" height="20" width="20" src="https://github.com/JohnnyCarvalho/user-microservices/blob/master/backend/register-user-api/assets/ok.png"> - Concluído. <br>
+<img align="center" height="22" width="20" src="https://github.com/JohnnyCarvalho/user-microservices/blob/feature/006-UnitaryTests/backend/register-user-api/assets/pending.png"> - Pendente. <br>
+<img align="center" height="20" width="20" src="https://github.com/JohnnyCarvalho/user-microservices/blob/master/backend/register-user-api/assets/ok.png"> - Concluído.
 
 
 ## Projeto geral
 
-- <img align="center" height="20" width="20" src="https://github.com/JohnnyCarvalho/user-microservices/blob/master/backend/register-user-api/assets/loading.gif"> <b>Front end</b>
+- <img align="center" height="22" width="20" src="https://github.com/JohnnyCarvalho/user-microservices/blob/feature/006-UnitaryTests/backend/register-user-api/assets/pending.png"> <b>Front end</b>
 - <img align="center" height="20" width="20" src="https://github.com/JohnnyCarvalho/user-microservices/blob/master/backend/register-user-api/assets/ok.png"> <b>Microcervices email</b>
 - <img align="center" height="20" width="20" src="https://github.com/JohnnyCarvalho/user-microservices/blob/master/backend/register-user-api/assets/ok.png"> <b>Microcervices register-user</b>
 
@@ -138,7 +139,7 @@ O objeto que deve ser enviado no body da requisição é um semelhante a esse:
     "phone_number": "41989564256",
     "document_number": "025485685456",
     "street": "Teixeira Luiz Da Rocha",
-    "house_number": 694,
+    "house_number": "694",
     "reference_point": "Farmácias Nissei",
     "state": "MG",
     "country": "Brasil",
