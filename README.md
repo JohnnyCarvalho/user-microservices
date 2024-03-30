@@ -28,7 +28,7 @@ Esse projeto será executado em etapas, a começar pelos 2 microservices back-en
 
 ## Projeto geral
 
-- <img align="center" height="22" width="20" src="https://github.com/JohnnyCarvalho/user-microservices/blob/feature/006-UnitaryTests/backend/register-user-api/assets/pending.png"> <b>Front end</b>
+- <img align="center" height="22" width="20" src="https://github.com/JohnnyCarvalho/user-microservices/blob/master/backend/register-user-api/assets/pending.png"> <b>Front end</b>
 - <img align="center" height="20" width="20" src="https://github.com/JohnnyCarvalho/user-microservices/blob/master/backend/register-user-api/assets/ok.png"> <b>Microcervices email</b>
 - <img align="center" height="20" width="20" src="https://github.com/JohnnyCarvalho/user-microservices/blob/master/backend/register-user-api/assets/ok.png"> <b>Microcervices register-user</b>
 
