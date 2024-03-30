@@ -9,46 +9,53 @@ import com.ecommerce.registeruserapi.dto.response.UserCreateResponse;
 import com.ecommerce.registeruserapi.entities.User;
 import com.ecommerce.registeruserapi.exception.AlreadyExistException;
 import com.ecommerce.registeruserapi.exception.UserBlockedException;
-import com.ecommerce.registeruserapi.mappers.UserCreateMapper;
 import com.ecommerce.registeruserapi.producer.UserProducer;
 import com.ecommerce.registeruserapi.repositories.UserRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     private final UserProducer userProducer;
 
     private final PasswordEncoder passwordEncoder;
 
+    private final ModelMapper modelMapper;
+
     public UserCreateResponse createUser(UserCreateRequest userCreate) {
-
-        verifyUserNameAlreadyExist(userCreate);
-
-        verifyEmailAlreadyExist(userCreate);
 
         verifyUserStatus(userCreate);
 
         String hashedPassword = passwordEncoder.encode(userCreate.getPassword());
 
-        final User newUser = UserCreateMapper.toCreateModel(userCreate, hashedPassword);
+        userCreate.setPassword(hashedPassword);
+
+        final User newUser = modelMapper.map(userCreate, User.class);
 
         userRepository.save(newUser);
 
         sendNotification(userCreate);
 
-        return UserCreateMapper.toCreateResponseModel(newUser);
+        return modelMapper.map(newUser, UserCreateResponse.class);
+    }
+
+
+    private void verifyUserStatus(UserCreateRequest userCreate) {
+        Optional<User> userStatus = userRepository.findByUserName(userCreate.getUserName());
+
+        if (userStatus.isPresent() && userStatus.get().getStatus().equals(false)) {
+            throw new UserBlockedException(USER_BLOCKED.getKey());
+        }
+        verifyUserNameAlreadyExist(userCreate);
     }
 
     private void verifyUserNameAlreadyExist(UserCreateRequest userCreate) {
@@ -56,6 +63,7 @@ public class UserService {
                 .ifPresent(existingUser -> {
                     throw new AlreadyExistException(USER_NAME_ALREADY_EXIST.getKey());
                 });
+        verifyEmailAlreadyExist(userCreate);
     }
 
 
@@ -64,14 +72,6 @@ public class UserService {
                 .ifPresent(existingUserEmail -> {
                     throw new AlreadyExistException(EMAIL_ALREADY_EXIST.getKey());
                 });
-    }
-
-    private void verifyUserStatus(UserCreateRequest userCreate) {
-        User userStatus = userRepository.findUserByUserName(userCreate.getUserName());
-
-        if (userStatus != null && Boolean.FALSE.equals(userStatus.getStatus())) {
-            throw new UserBlockedException(USER_BLOCKED.getKey());
-        }
     }
 
     private void sendNotification(UserCreateRequest userCreate) {

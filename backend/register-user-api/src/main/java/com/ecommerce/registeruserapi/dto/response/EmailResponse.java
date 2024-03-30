@@ -13,7 +13,7 @@ public class EmailResponse {
 
     private String emailTo;
 
-    private String subject;
+    private String subject = "Registration Successfully Completed!";
 
     private String text;
 }
